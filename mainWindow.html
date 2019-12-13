@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Print Test</title>
+</head>
+<body>
+	<h1>Print Test</h1>
+	<img src="assets/icons/png/icon.png" width="48">
+	<select id="printer" style="display: none;">
+		<option value="0">Velg skriver</option>
+	</select>
+
+	<button id="print-test-btn" style="display: none;">
+		Skriv ut test
+	</button>
+
+	<script>
+		const electron = require('electron');
+		const ipcRenderer = electron;
+		const printer = require('pdf-to-printer');
+		const jQuery = require('jquery');
+		let selectedPrinter = null;
+
+		(function($) {
+			printer.list().then(function(printers) {
+				$.each(printers,function(index,printer) {
+					$("#printer").append(new Option(printer, printer));
+				});
+				$("#printer").css('display','inline-block');
+			}).catch(console.error);
+
+			$('#printer').on('change',function() {
+				if($(this).val() != 0) {
+					$('#print-test-btn').css('display','inline-block');
+					selectedPrinter = $(this).val();
+				} else {
+					$('#print-test-btn').css('display','none');
+				}
+			});
+
+			$('#print-test-btn').click(function() {
+				console.log('printing...');
+				printer
+				  .print(__dirname + "/assets/samples/receipt.pdf",{
+				  	printer: selectedPrinter
+				  })
+				  .then(console.log)
+				  .catch(console.error);
+			});
+		}(jQuery));
+
+		
+		
+	</script>
+</body>
+</html>
