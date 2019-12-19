@@ -4,8 +4,10 @@
   "description": "Test print",
   "main": "main.js",
   "dependencies": {
+    "bootstrap": "^4.4.1",
     "jquery": "^3.4.1",
-    "pdf-to-printer": "^1.0.7"
+    "pdf-to-printer": "^1.0.7",
+    "popper.js": "^1.16.0"
   },
   "devDependencies": {
     "electron": "^7.1.5",
@@ -15,7 +17,7 @@
   "scripts": {
     "start": "electron .",
     "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
-    "package-win": "electron-packager . --overwrite --asar --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Print test\"",
+    "package-win": "electron-packager . --overwrite --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Print test\"",
     "package-linux": "electron-packager . --overwrite --platform=linux --arch=x64 --icon=assets/icons/png/icon.png --prune=true --out=release-builds",
     "dist": "electron-builder"
   },

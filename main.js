@@ -1,7 +1,6 @@
 const electron = require('electron');
 const url = require('url');
 const path = require('path');
-const jQuery = require('jquery');
 
 
 //Set ENV
@@ -29,7 +28,7 @@ process.env.NODE_ENV = 'development';
  		app.quit();
  	});
 
- 	mainWindow.webContents.openDevTools()
+ 	//mainWindow.webContents.openDevTools()
  });
 
  
@@ -39,7 +38,7 @@ process.env.NODE_ENV = 'development';
   .catch(console.error);*/
 
 /*printer
-  .print("pdf-sample.pdf")
+  .print("pdf-sample.pdf")//
   .then(console.log)
   .catch(console.error);
   */

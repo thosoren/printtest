@@ -3,31 +3,89 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Print Test</title>
+	<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-	<h1>Print Test</h1>
-	<img src="assets/icons/png/icon.png" width="48">
-	<select id="printer" style="display: none;">
-		<option value="0">Velg skriver</option>
-	</select>
+<div class="loading-container">
+	<div class="spinner-border text-light" role="status">
+		<span class="sr-only">Loading...</span>
+	</div>
+</div>
 
-	<button id="print-test-btn" style="display: none;">
-		Skriv ut test
-	</button>
 
+
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+  <header class="masthead">
+    <div class="inner">
+      <h1 class="masthead-brand">SushiBar - print test</h1>
+      
+    </div>
+  </header>
+
+  <main role="main" class="inner cover">
+    <h3 class="cover-heading">Velg skriver</h3>
+    
+	<div class="row">
+     	<div class="col-4">
+			<select class="form-control" id="printer">
+				
+			</select>
+      	</div>
+      	<div class="col-8">
+      		<button class="btn btn-info" id="print-test-btn-1">
+				Skriv ut test 1
+			</button>
+			<button class="btn btn-info" id="print-test-btn-2">
+				Skriv ut test 2
+			</button>
+			<button class="btn btn-info" id="print-test-btn-3">
+				Skriv ut test 3
+			</button>
+      	</div>
+    </div>
+
+
+
+  </main>
+
+ 
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Receipt sent to printer</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-footer">
+
+      </div>
+    </div>
+  </div>
+</div>
+	
 	<script>
 		const electron = require('electron');
 		const ipcRenderer = electron;
 		const printer = require('pdf-to-printer');
-		const jQuery = require('jquery');
+		window.$ = window.jQuery = require('jquery');
 		let selectedPrinter = null;
 
-		(function($) {
+		$(document).ready(function() {
 			printer.list().then(function(printers) {
 				$.each(printers,function(index,printer) {
 					$("#printer").append(new Option(printer, printer));
 				});
-				$("#printer").css('display','inline-block');
+				setTimeout(function() {
+					$('.loading-container .spinner-border').css('display','none');
+					$('.loading-container').fadeOut();
+				},1000);
 			}).catch(console.error);
 
 			$('#printer').on('change',function() {
@@ -39,19 +97,33 @@
 				}
 			});
 
-			$('#print-test-btn').click(function() {
-				console.log('printing...');
-				printer
-				  .print(__dirname + "/assets/samples/receipt.pdf",{
-				  	printer: selectedPrinter
-				  })
-				  .then(console.log)
-				  .catch(console.error);
-			});
-		}(jQuery));
+			$('#print-test-btn-1').click(function() {
 
+				print('test1.pdf');
+			});
+			$('#print-test-btn-2').click(function() {
+				print('test2.pdf');
+			});
+			$('#print-test-btn-3').click(function() {
+				print('test3.pdf');
+			});
+
+			
+		});
+
+		function print(file) {
+			$('.modal').modal();
+			console.log('printing...');
+			printer
+			  .print(__dirname + "/assets/samples/" + file,{
+			  	printer: selectedPrinter
+			  })
+			  .then(console.log)
+			  .catch(console.error);
+		}
 		
 		
 	</script>
+	<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
