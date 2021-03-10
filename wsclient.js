@@ -53,7 +53,7 @@ $(function () {
       statuspill.css('display','block').html('Koblet til - ' + json.restaurant.name);
     } else if (json.type === 'pdf') {
 		  printFromUrl(json.url);
-      displayAlert("Ny ordre printes: " + json.order_id);
+      displayAlert(json.title);
     } else if (json.type === 'error') { // entire message history
 		alert(json.message);
     } else {
