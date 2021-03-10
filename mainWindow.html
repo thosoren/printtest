@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Print Test</title>
+	<title>Sushibar - Print</title>
 	<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
 	<link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -18,33 +18,42 @@
     <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
   <header class="masthead">
     <div class="inner">
-      <h1 class="masthead-brand">SushiBar - print test</h1>
+      <h1 class="masthead-brand">SushiBar - Print</h1>
       
     </div>
+    <span id="status-pill" class="badge badge-pill badge-success"></span>
   </header>
 
   <main role="main" class="inner cover">
-    <h3 class="cover-heading">Velg skriver</h3>
     
-	<div class="row">
-     	<div class="col-4">
-			<select class="form-control" id="printer">
-				
-			</select>
-      	</div>
-      	<div class="col-8">
-      		<button class="btn btn-info" id="print-test-btn-1">
-				Skriv ut test 1
-			</button>
-			<button class="btn btn-info" id="print-test-btn-2">
-				Skriv ut test 2
-			</button>
-			<button class="btn btn-info" id="print-test-btn-3">
-				Skriv ut test 3
-			</button>
-      	</div>
+    <div id="restaurant-select-container" class="connection">
+    	
+	<div class="form-group">
+	<label for="exampleInputEmail1">Restaurant</label>
+		<select class="form-control" id="restaurants">
+			<option value="0">Velg</option>
+		</select>
+	
+	</div>
+	<div class="form-group">
+	<label for="exampleInputPassword1">Skriver</label>
+	<select class="form-control" id="printer">
+		<option value="0">Velg</option>	
+	</select>
+	</div>
+
+	<button id="connect-restaurant" type="button" class="btn btn-primary">Koble opp</button>
+		
     </div>
 
+
+	
+
+    <div id="content"></div>
+    
+    <div id="print-alert" class="alert alert-success" role="alert">
+	  A simple success alert—check it out!
+	</div>
 
 
   </main>
@@ -74,6 +83,10 @@
 		const electron = require('electron');
 		const ipcRenderer = electron;
 		const printer = require('pdf-to-printer');
+		const fs = require("fs");
+	  	const path = require("path");
+		const fetch = require("node-fetch");
+
 		window.$ = window.jQuery = require('jquery');
 		let selectedPrinter = null;
 
@@ -111,11 +124,43 @@
 			
 		});
 
+		function printFromUrl(url) {
+			fetch(url)
+				.then((res) => res.buffer())
+				.then((buffer) => {
+					const pdf = save(buffer);
+
+					printer
+					.print(pdf, {
+			  			printer: selectedPrinter
+			  		})
+					.then(console.log)
+					.catch(console.error)
+					.finally(() => remove(pdf));
+			});
+
+		}
+
+		function save(buffer) {
+			const pdfPath = path.join(__dirname, "./" + randomString() + ".pdf");
+			fs.writeFileSync(pdfPath, buffer, "binary");
+			return pdfPath;
+		}
+
+		function randomString() {
+			return Math.random().toString(36).substring(7);
+		}
+
+		function remove(pdf) {
+			fs.unlinkSync(pdf);
+		}
+
 		function print(file) {
 			$('.modal').modal();
 			console.log('printing...');
 			printer
-			  .print(__dirname + "/assets/samples/" + file,{
+			  //.print(__dirname + "/assets/samples/" + file,{
+			  	.print(file,{
 			  	printer: selectedPrinter
 			  })
 			  .then(console.log)
@@ -125,5 +170,6 @@
 		
 	</script>
 	<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="wsclient.js"></script>
 </body>
 </html>

@@ -6,11 +6,11 @@ const path = require('path');
 //Set ENV
 process.env.NODE_ENV = 'development';
  
- const {app, BrowserWindow, Menu, ipcMain} = electron;
+const {app, BrowserWindow, Menu, ipcMain} = electron;
 
- let mainWindow;
+let mainWindow;
 
- app.on('ready',function() {
+app.on('ready',function() {
  	//Create new window
  	mainWindow = new BrowserWindow({
  		webPreferences: {
@@ -28,8 +28,9 @@ process.env.NODE_ENV = 'development';
  		app.quit();
  	});
 
- 	//mainWindow.webContents.openDevTools()
- });
+ 	//mainWindow.webContents.openDevTools();
+
+});
 
  
 /*printer
