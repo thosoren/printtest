@@ -5,7 +5,7 @@
   "main": "main.js",
   "dependencies": {
     "bootstrap": "^4.4.1",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "node-fetch": "^2.6.1",
     "pdf-to-printer": "^1.0.7",
     "popper.js": "^1.16.0"
