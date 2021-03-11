@@ -11,6 +11,10 @@ $(function () {
   var statuspill = $('#status-pill');
   var printerSelect = $('#printer');
 
+  var restaurantId = 0;
+
+  var connection;
+
   // if user is running mozilla then use it's built-in WebSocket
   window.WebSocket = window.WebSocket || window.MozWebSocket;
   // if browser doesn't support WebSocket, just show
@@ -19,11 +23,21 @@ $(function () {
     console.log('Sorry, but your browser doesn\'t support WebSocket.');
     return;
   }
+
+function connect() {
+
+
   // open connection
-  var connection = new WebSocket('ws://print.stg.sushibar.no:1337');
+  connection = new WebSocket('ws://stg.sushibar.no:1337');
   connection.onopen = function () {
     // first we want users to enter their names
-    
+    if(restaurantId != 0) {
+      var obj = {
+        type: "chosen_restaurant",
+        restaurant: restaurantId
+      };
+      connection.send(JSON.stringify(obj));
+    }
   };
   connection.onerror = function (error) {
     // just in there were some problems with connection...
@@ -48,9 +62,9 @@ $(function () {
       });
 
     } else if(json.type == "connected") {
-  		alert("Connected as " + json.restaurant.name);
+  		//alert("Connected as " + json.restaurant.name);
   		selectContainer.css('display','none');
-      statuspill.css('display','block').html('Koblet til - ' + json.restaurant.name);
+      statuspill.css('display','block').removeClass('badge-danger').addClass('badge-success').html('Koblet til - ' + json.restaurant.name);
     } else if (json.type === 'pdf') {
 		  printFromUrl(json.url);
       displayAlert(json.title);
@@ -60,6 +74,7 @@ $(function () {
 		console.log('Hmm..., I\'ve never seen JSON like this:', json);
     }
   };
+}
   
   /**
    * This method is optional. If the server wasn't able to
@@ -68,7 +83,11 @@ $(function () {
    */
   setInterval(function() {
     if (connection.readyState !== 1) {
+      statuspill.css('display','block').removeClass('badge-success').addClass('badge-danger').html('Lost connection');
       console.log('Unable to communicate with the WebSocket server.');
+      //try to reconnect
+      console.log('trying to re-connect');
+      connect()
     }
   }, 3000);
 
@@ -80,13 +99,17 @@ $(function () {
       alert("Du må velge printer");
       return;
     }
-    console.log("Chosen restaurant = " + select.val());
+    restaurantId = select.val();
+    console.log("Chosen restaurant = " + restaurantId);
     var obj = {
       type: "chosen_restaurant",
-      restaurant: select.val()
+      restaurant: restaurantId
     };
     connection.send(JSON.stringify(obj));
   });
+
+
+connect();
 
 
   function displayAlert(text) {
