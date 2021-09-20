@@ -2,174 +2,212 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Sushibar - Print</title>
-	<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+	<title>Sushibar Ordre</title>
+	<!-- <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css"> -->
+	<link rel="stylesheet" href="node_modules/bootswatch/dist/superhero/bootstrap.min.css">
+	<link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.css">
 	<link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-<div class="loading-container">
-	<div class="spinner-border text-light" role="status">
-		<span class="sr-only">Loading...</span>
-	</div>
-</div>
 
-
-
-    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
-  <header class="masthead">
-    <div class="inner">
-      <h1 class="masthead-brand">SushiBar - Print</h1>
-      
-    </div>
-    <span id="status-pill" class="badge badge-pill badge-success"></span>
-  </header>
-
-  <main role="main" class="inner cover">
-    
-    <div id="restaurant-select-container" class="connection">
-    	
-	<div class="form-group">
-	<label for="exampleInputEmail1">Restaurant</label>
-		<select class="form-control" id="restaurants">
-			<option value="0">Velg</option>
-		</select>
-	
-	</div>
-	<div class="form-group">
-	<label for="exampleInputPassword1">Skriver</label>
-	<select class="form-control" id="printer">
-		<option value="0">Velg</option>	
-	</select>
-	</div>
-
-	<button id="connect-restaurant" type="button" class="btn btn-primary">Koble opp</button>
-		
-    </div>
-
-
-	
-
-    <div id="content"></div>
-    
-    <div id="print-alert" class="alert alert-success" role="alert">
-	  A simple success alert—check it out!
-	</div>
-
-
-  </main>
-
- 
-</div>
-
-
-<div class="modal fade" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Receipt sent to printer</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-
-      <div class="modal-footer">
-
-      </div>
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Sushibar Ordre</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="dropdown03" data-bs-toggle="dropdown" aria-expanded="false">Rapporter</a>
+            <ul class="dropdown-menu dropdown-reports" aria-labelledby="dropdown03">
+            </ul>
+          </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown"  href="#">Konfigurasjon</a>
+          <ul class="dropdown-menu" aria-labelledby="dropdown03">
+              <li><a data-bs-toggle="modal" data-bs-target="#restaurantSelectModal" class="dropdown-item">Velg restaurant</a></li>
+              <li><a data-bs-toggle="modal" data-bs-target="#printerSelectModal" class="dropdown-item">Velg printer</a></li>
+            </ul>
+        </li>
+        
+      </ul>
+      <div class="statuses">
+			Restaurant: <span data-bs-toggle="modal" data-bs-target="#restaurantSelectModal" id="status-restaurant" class="badge rounded-pill status-pill bg-danger">Ikke koblet til</span>
+			Printer: <span data-bs-toggle="modal" data-bs-target="#printerSelectModal" id="status-printer" class="badge rounded-pill status-pill bg-success"></span>
+			Server: <span id="status-server" class="badge rounded-pill status-pill bg-danger">Offline</span>
+		</div>
     </div>
   </div>
-</div>
-	
+</nav>
+
+	<div class="loading-container">
+		<div class="spinner-border text-light" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+
+
+
+	<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+
+
+
+		<div id="alerts">
+
+		</div>
+
+
+
+
+
+
+		
+		<div id="report-btns"></div>
+
+		<main role="main" class="inner cover">
+
+
+			<div class="waiting-for-orders">
+				<h4>Venter på nye ordre</h4>
+				<div class="progress">
+			  		<div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+			  	</div>
+			</div>
+
+
+			<div id="content">
+
+
+
+				<h3>Siste ordre</h3>
+				<table id="latest-orders-table" class="table">
+					<thead>
+						<tr>
+							<th scope="col">Ordre ID</th>
+							<th scope="col">Navn</th>
+							<th scope="col">Type</th>
+							<th scope="col">Bestilt</th>
+							<th scope="col">Sum</th>
+							<th scope="col">Print</th>
+						</tr>
+					</thead>
+					<tbody>
+
+					</tbody>
+				</table>
+
+
+
+			</div>
+
+
+
+
+		</main>
+
+
+	</div>
+
+
+	<!-- New order alert Modal -->
+	<div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="printAlertModal" tabindex="-1" aria-labelledby="printAlertModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<form class="form" action="confirm_new_order">
+				<div class="modal-content new-order-alert">
+					<div class="modal-header">
+						<h5 class="modal-title" id="printAlertModalLabel">Ny ordre</h5>
+					</div>
+					<div class="modal-body">
+
+					</div>
+					<div class="modal-footer">
+						<input type="hidden" name="oid">
+						<button type="submit" class="btn btn-primary">Bekreft printet</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+
+
+	<!-- Modal Select Printer -->
+	<div class="modal fade" id="printerSelectModal" tabindex="-1" aria-labelledby="printerSelectModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form class="form" action="choose_printer">
+					<div class="modal-header">
+						<h5 class="modal-title" id="printerSelectModalLabel">Velg printer</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Lukk"></button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="exampleInputPassword1">Skriver</label>
+							<select id="printer" name="printer" class="form-control">
+								<option value="0">Velg</option>	
+							</select>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Lukk</button>
+						<button type="submit" class="btn btn-primary">Lagre</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+
+	<!-- Modal Select Restaurant -->
+
+	<div class="modal fade" id="restaurantSelectModal" tabindex="-1" aria-labelledby="restaurantSelectModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form class="form" action="choose_restaurant">
+					<div class="modal-header">
+						<h5 class="modal-title" id="restaurantSelectModalLabel">Velg restaurant</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Lukk"></button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label>Restaurant</label>
+							<select name="restaurantid" class="form-control" id="restaurants">
+								<option value="0">Velg</option>
+							</select>
+						</div>
+
+						<div class="form-group">
+							<label>Passord</label>
+							<input class="form-control" name="password" type="password">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Lukk</button>
+						<button type="submit" class="btn btn-primary">Lagre og koble til</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+
 	<script>
-		const electron = require('electron');
-		const ipcRenderer = electron;
-		const printer = require('pdf-to-printer');
-		const fs = require("fs");
-	  	const path = require("path");
-		const fetch = require("node-fetch");
+
 
 		window.$ = window.jQuery = require('jquery');
-		let selectedPrinter = null;
 
-		$(document).ready(function() {
-			printer.list().then(function(printers) {
-				$.each(printers,function(index,printer) {
-					$("#printer").append(new Option(printer, printer));
-				});
-				setTimeout(function() {
-					$('.loading-container .spinner-border').css('display','none');
-					$('.loading-container').fadeOut();
-				},1000);
-			}).catch(console.error);
 
-			$('#printer').on('change',function() {
-				if($(this).val() != 0) {
-					$('#print-test-btn').css('display','inline-block');
-					selectedPrinter = $(this).val();
-				} else {
-					$('#print-test-btn').css('display','none');
-				}
-			});
 
-			$('#print-test-btn-1').click(function() {
-
-				print('test1.pdf');
-			});
-			$('#print-test-btn-2').click(function() {
-				print('test2.pdf');
-			});
-			$('#print-test-btn-3').click(function() {
-				print('test3.pdf');
-			});
-
-			
-		});
-
-		function printFromUrl(url) {
-			fetch(url)
-				.then((res) => res.buffer())
-				.then((buffer) => {
-					const pdf = save(buffer);
-
-					printer
-					.print(pdf, {
-			  			printer: selectedPrinter
-			  		})
-					.then(console.log)
-					.catch(console.error)
-					.finally(() => remove(pdf));
-			});
-
-		}
-
-		function save(buffer) {
-			const pdfPath = path.join(__dirname, "./" + randomString() + ".pdf");
-			fs.writeFileSync(pdfPath, buffer, "binary");
-			return pdfPath;
-		}
-
-		function randomString() {
-			return Math.random().toString(36).substring(7);
-		}
-
-		function remove(pdf) {
-			fs.unlinkSync(pdf);
-		}
-
-		function print(file) {
-			$('.modal').modal();
-			console.log('printing...');
-			printer
-			  //.print(__dirname + "/assets/samples/" + file,{
-			  	.print(file,{
-			  	printer: selectedPrinter
-			  })
-			  .then(console.log)
-			  .catch(console.error);
-		}
-		
-		
 	</script>
 	<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-	<script src="wsclient.js"></script>
+	<script src="window.js"></script>
 </body>
 </html>

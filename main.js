@@ -3,12 +3,14 @@ const url = require('url');
 const path = require('path');
 
 
+
 //Set ENV
 process.env.NODE_ENV = 'development';
  
 const {app, BrowserWindow, Menu, ipcMain} = electron;
 
 let mainWindow;
+
 
 app.on('ready',function() {
  	//Create new window
@@ -31,15 +33,3 @@ app.on('ready',function() {
  	//mainWindow.webContents.openDevTools();
 
 });
-
- 
-/*printer
-  .list()
-  .then(console.log)
-  .catch(console.error);*/
-
-/*printer
-  .print("pdf-sample.pdf")//
-  .then(console.log)
-  .catch(console.error);
-  */
