@@ -15,8 +15,11 @@ let mainWindow;
 app.on('ready',function() {
  	//Create new window
  	mainWindow = new BrowserWindow({
+        width: 1024, 
+        height: 900,
  		webPreferences: {
             nodeIntegration: true
+            
         }
  	});
  	//Load html into window

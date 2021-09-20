@@ -7,6 +7,7 @@ $(() => {
 	const path = require("path");
 	const fetch = require("node-fetch");
 	const Store = require('./store.js');
+	var pjson = require('./package.json');
 
 	// for better performance - to avoid searching in DOM
 
@@ -63,8 +64,7 @@ $(() => {
 		}
 	});
 
-
-
+	$('.version').html("v" + pjson.version);
 
 	$('.form').on('submit', function() {
 		var form = this;
@@ -90,7 +90,6 @@ $(() => {
 		$('.modal').modal('hide');
 		return false;
 	});
-
 
 	connect();      
 
@@ -139,6 +138,8 @@ $(() => {
 
 	function connect() {
 
+		console.log('version is ' + pjson.version);
+
 		// open connection
 		connection = new WebSocket('ws://stg.sushibar.no:1336');
 		connection.onopen = function () {
@@ -151,8 +152,9 @@ $(() => {
 				selectedRestaurant = storedRestaurant.id;
 			} else {
 				setRestaurantStatus(false);
+				$('#restaurantSelectModal').modal('show');
 			}
-			// first we want users to enter their names
+
 			if(selectedRestaurant !== null) {
 				connectRestaurant(selectedRestaurant,store.get('password'));
 			}
@@ -178,6 +180,10 @@ $(() => {
 
 			switch (json.type) {
 				case 'restaurants':
+					if(pjson.version != json.server_version) {
+						alert("Denne versjonen av ordre-applikasjonen er forledret, vennligst etterpør siste versjon.\nServer versjon: " + json.server_version + ", app versjon: " + pjson.version);
+						window.close();
+					}
 					restaurantSelect.empty().append(new Option("Velg",0));
 					$.each(json.restaurants,function(index,restaurant) {
 						restaurantSelect.append(new Option(restaurant.name,restaurant.printerid));
@@ -198,8 +204,8 @@ $(() => {
 
 				case 'existing_order':
 					printFromUrl(json.url);
-					//successAlert(json.title);
-					alertNewOrder(json.oid,json.title);
+					warningAlert(json.title);
+					//alertNewOrder(json.oid,json.title);
 				break;
 
 				case 'new_order':
@@ -210,7 +216,7 @@ $(() => {
 				case 'report':
 					printFromUrl(json.url);
 					//alertPrint(json.title);
-					successAlert(json.title);
+					warningAlert(json.title);
 				break;
 
 				case 'not_authorized':
@@ -283,9 +289,11 @@ $(() => {
 	function setRestaurantStatus(connected,restaurantName) {
 		if(connected) {
 			$('.waiting-for-orders').css('display','block');
+			$('#latest-orders-container').css('display','block');
 			statuspillRestaurant.css('display','inline-block').removeClass('bg-danger').addClass('bg-success').html(restaurantName);
 		} else {
 			$('.waiting-for-orders').css('display','none');
+			$('#latest-orders-container').css('display','none');
 			statuspillRestaurant.css('display','inline-block').removeClass('bg-success').addClass('bg-danger').html('Ikke koblet til');
 		}
 	}
@@ -361,6 +369,7 @@ $(() => {
 		var button = $('<button class="btn btn-secondary btn-sm">Print</button>');
 		button.click(function() {
 			printFromUrl(order.file_url);
+			warningAlert("Printer ordrenummer: " + order.id);
 		});
 		row.append('<td>' + order.id + '</td>');
 		row.append('<td>' + order.name + '</td>');
