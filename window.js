@@ -22,6 +22,8 @@ $(() => {
 	var confirmPrintedUrl;
 	var webshopUrl;
 
+	var intervalTimer;
+
 	const store = new Store({
 	    configName: 'user-preferences'
 	});
@@ -138,13 +140,19 @@ $(() => {
 
 	function connect() {
 
-		console.log('version is ' + pjson.version);
+		warningAlert("Kobler til server...");
+
 
 		// open connection
 		connection = new WebSocket('ws://stg.sushibar.no:1336');
 		connection.onopen = function () {
 
 			setServerOnline(true);
+
+			console.log('intervalTimer = ', intervalTimer);
+			if(intervalTimer) {
+				clearInterval(intervalTimer);
+			}
 
 			var storedRestaurant = store.get('restaurant');
 
@@ -159,6 +167,8 @@ $(() => {
 				connectRestaurant(selectedRestaurant,store.get('password'));
 			}
 		};
+
+		connection.onclose = connectionClosed
 
 		connection.onerror = function (error) {
 			// just in there were some problems with connection...
@@ -186,7 +196,7 @@ $(() => {
 					}
 					restaurantSelect.empty().append(new Option("Velg",0));
 					$.each(json.restaurants,function(index,restaurant) {
-						restaurantSelect.append(new Option(restaurant.name,restaurant.printerid));
+						restaurantSelect.append(new Option(restaurant.name,restaurant.id));
 					});
 				break;
 
@@ -413,25 +423,19 @@ $(() => {
 	}
 
 
-
-	/**
-	* This method is optional. If the server wasn't able to
-	* respond to the in 3 seconds then show some error message 
-	* to notify the user that something is wrong.
-	*/
-	setInterval(function() {
-		if (connection.readyState !== 1) {
-			setServerOnline(false);
-			setRestaurantStatus(false);
-			//statuspillRestaurant.css('display','inline-block').removeClass('badge-success').addClass('badge-danger').html('Ikke koblet til');
-			console.log('Unable to communicate with the WebSocket server.');
-			//try to reconnect
-			console.log('trying to re-connect');
-			connect()
+	function connectionClosed(event) {
+		setServerOnline(false);
+		setRestaurantStatus(false);
+		if(!event.wasClean) {
+			//if the connection was closed due to server downtime, it should try to re-connect every 3 seconds
+			if(typeof intervalTimer == 'undefined') {
+				intervalTimer = setInterval(connect,3000);
+			}
+		} else {
+			alert("Koblingen til serveren ble lukket, applikasjonen må startes på nytt for å koble til igjen.")
+			window.close();
 		}
-	}, 3000);
-
-
+	}
 
 
 });
