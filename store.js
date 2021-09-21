@@ -32,7 +32,7 @@ function parseDataFile(filePath) {
   	try {
   		return JSON.parse(fs.readFileSync(filePath));
   	} catch (error) {
-  		return false;
+  		return {};
   	}
 }
 
