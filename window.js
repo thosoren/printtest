@@ -129,7 +129,6 @@ $(() => {
 
 	function print(file) {
 		$('.modal').modal();
-		console.log('printing...');
 		printer
 		.print(file,{
 			printer: selectedPrinter
@@ -149,7 +148,6 @@ $(() => {
 
 			setServerOnline(true);
 
-			console.log('intervalTimer = ', intervalTimer);
 			if(intervalTimer) {
 				clearInterval(intervalTimer);
 			}
@@ -186,7 +184,6 @@ $(() => {
 				console.log('Invalid JSON: ', message.data);
 				return;
 			}
-			console.log(json);
 
 			switch (json.type) {
 				case 'restaurants':
@@ -346,7 +343,6 @@ $(() => {
 	}
 
 	function confirmPrinted(oid) {
-		console.log('confirmed printed: ' + oid);
 
 		var obj = {
 			type: "confirm_printed",
