@@ -5,7 +5,9 @@ const path = require('path');
 
 
 //Set ENV
-process.env.NODE_ENV = 'development';
+process.env.NODE_ENV = 'production';
+
+//console.log(process.env.NODE_ENV);
  
 const {app, BrowserWindow, Menu, ipcMain} = electron;
 

@@ -38,8 +38,6 @@ $(() => {
 		setPrinterStatus(false);
 	}
 
-
-
 	// if user is running mozilla then use it's built-in WebSocket
 	window.WebSocket = window.WebSocket || window.MozWebSocket;
 	// if browser doesn't support WebSocket, just show
@@ -143,7 +141,7 @@ $(() => {
 
 
 		// open connection
-		connection = new WebSocket('ws://stg.sushibar.no:1336');
+		connection = new WebSocket('ws://sushibar.no:1337');
 		connection.onopen = function () {
 
 			setServerOnline(true);
@@ -188,7 +186,7 @@ $(() => {
 			switch (json.type) {
 				case 'restaurants':
 					if(pjson.version != json.server_version) {
-						alert("Denne versjonen av ordre-applikasjonen er forledret, vennligst etterpør siste versjon.\nServer versjon: " + json.server_version + ", app versjon: " + pjson.version);
+						alert("Denne versjonen av ordre-applikasjonen stemmer ikke med serveren, vennligst etterpør ny versjon.\nServer versjon: " + json.server_version + ", app versjon: " + pjson.version);
 						window.close();
 					}
 					restaurantSelect.empty().append(new Option("Velg",0));
