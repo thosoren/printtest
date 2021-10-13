@@ -7,30 +7,32 @@ $(() => {
 	const path = require("path");
 	const fetch = require("node-fetch");
 	const Store = require('./store.js');
-	var pjson = require('./package.json');
+	const pjson = require('./package.json');
 
 	// for better performance - to avoid searching in DOM
 
-	var statuspillRestaurant = $('#status-restaurant');
-	var statuspillPrinter = $('#status-printer');
-	var restaurantSelect = $('#restaurants');
-	var printerSelect = $('#printer');
+	const statuspillRestaurant = $('#status-restaurant');
+	const statuspillPrinter = $('#status-printer');
+	const restaurantSelect = $('#restaurants');
+
+	const alertModal = document.getElementById('printAlertModal');
 
 	let selectedPrinter = null;
-	var selectedRestaurant = null;
-	var connection;
-	var confirmPrintedUrl;
-	var webshopUrl;
+	let selectedRestaurant = null;
+	let connection;
+	let webshopUrl;
+	let unconfirmedOrders = [];
+	let alertingNewOrder = false;
 
-	var intervalTimer;
+	let intervalTimer;
 
 	const store = new Store({
 	    configName: 'user-preferences'
 	});
 
-	var dateOptions = { weekday: 'long', hour : '2-digit', minute: '2-digit' };
 
-	var storedPrinter = store.get('printer');
+
+	const storedPrinter = store.get('printer');
 
 	if(storedPrinter) {
 		setPrinter(storedPrinter);
@@ -63,6 +65,11 @@ $(() => {
 			store.set('printer',selectedPrinter);
 		}
 	});
+
+	alertModal.addEventListener('hidden.bs.modal', function (event) {
+		alertingNewOrder = false;
+		checkUnconfirmedOrders();
+	})
 
 	$('.version').html("v" + pjson.version);
 
@@ -141,7 +148,7 @@ $(() => {
 
 
 		// open connection
-		connection = new WebSocket('ws://sushibar.no:1337');
+		connection = new WebSocket('ws://sushibar.no:1336');
 		connection.onopen = function () {
 
 			setServerOnline(true);
@@ -201,6 +208,8 @@ $(() => {
 					webshopUrl = json.webshop_url;
 					setLatestOrders(json.latest_orders);
 					setupReportButtons(json.restaurant);
+					unconfirmedOrders = json.unconfirmed_orders;
+					checkUnconfirmedOrders();
 					confirmPrintedUrl = json.confirm_printed_url;
 					
 					store.set('restaurant',json.restaurant);
@@ -214,8 +223,11 @@ $(() => {
 				break;
 
 				case 'new_order':
-					printFromUrl(json.url);
-					alertNewOrder(json.oid,json.title);
+					//printFromUrl(json.url);
+					//alertNewOrder(json.oid,json.title);
+					unconfirmedOrders.unshift(json);
+					//console.log('length after push: ', unconfirmedOrders)
+					checkUnconfirmedOrders();
 				break;
 
 				case 'report':
@@ -320,19 +332,24 @@ $(() => {
 		
 	}
 
-
-	function alertPrint(title) {
-		var alert = $('<div title="Klikk for å bekrefte printet" class="alert alert-success print-alert" role="alert">' + title + '</div>')
-			.appendTo('#print-alerts')
-			.slideDown();
-
-		setInterval(function() {
-			$(alert).slideUp();
-		}, 5000);
+	function checkUnconfirmedOrders() {
+		if(unconfirmedOrders.length > 1) {
+			$('#order-count').html(` - totalt ${unconfirmedOrders.length} nye`);
+		} else {
+			$('#order-count').html('');
+		}
+		if(alertingNewOrder) return; //already alerting an order, will have to wait until it is confirmed printed, then the next order will be processed
+		if(unconfirmedOrders.length > 0) {
+			order = unconfirmedOrders.pop();
+			printFromUrl(getOrderUrl(order.id));
+			console.log('unconfirmed order',order);
+			const title = `${order.delivery ? 'Utkjøring' : 'Take-away'}<br>Ordrenummer: ${order.id}<br>Kundenavn: ${order.name}`; 
+			alertNewOrder(order.id,title);
+		}
 	}
 
 	function alertNewOrder(oid,title) {
-		
+		alertingNewOrder = true;
 		$('#printAlertModal .modal-body').html(title);
 		$('#printAlertModal [name=oid]').val(oid);
 
@@ -353,7 +370,6 @@ $(() => {
 	function setLatestOrders(orders) {
 		$('#latest-orders-table tbody').empty();
 		$.each(orders,function(index,order) {
-			order.file_url = webshopUrl + 'webshop/ordrefiler/' + order.id + '.pdf'
 		  	addOrderToLastOrders(order);
 		});
 	}
@@ -361,7 +377,7 @@ $(() => {
 	function addOrderToLastOrders(order) {
 		$('#latest-orders-table tbody').prepend(buildOrderRow(order).fadeIn('slow'));
 		var length = $('#latest-orders-table tbody').children().length;
-		if(length > 10) {
+		if(length > 20) {
 			var last = $('#latest-orders-table tbody').children()[10];
 			$(last).fadeOut();
 		}
@@ -372,17 +388,35 @@ $(() => {
 		var row = $('<tr style="display:none;">');
 		var button = $('<button class="btn btn-secondary btn-sm">Print</button>');
 		button.click(function() {
-			printFromUrl(order.file_url);
+			printFromUrl(getOrderUrl(order.id));
 			warningAlert("Printer ordrenummer: " + order.id);
 		});
 		row.append('<td>' + order.id + '</td>');
 		row.append('<td>' + order.name + '</td>');
 		row.append('<td>' + (order.delivery ? 'Utkjøring' : 'Take-away') + '</td>');
-		row.append('<td>' + (new Date(order.time)).toLocaleString("nb-NO", dateOptions) + '</td>');
-		row.append('<td>' + order.amount + '</td>');
+		row.append('<td>' + parseOrderDatetime(order.time) + '</td>');
+		row.append('<td>' + order.amount + ' kr</td>');
 		row.append($('<td>').append(button));
 
 		return row;
+	}
+
+	function getOrderUrl(oid) {
+		return webshopUrl + 'webshop/ordrefiler/' + oid + '.pdf';
+	}
+
+	function parseOrderDatetime(datetime) {
+		const now = new Date();
+		const orderDatetime = new Date(datetime);
+		const difference = now.getTime() - orderDatetime.getTime();
+		const days = difference / (1000 * 3600 * 24);
+		let dateOptions = { weekday: 'long', hour : '2-digit', minute: '2-digit' };
+		if(days > 7) { //add the date to the string if it is more than 7 days in the past
+			dateOptions = { weekday: 'long', month: 'short', day: '2-digit', hour : '2-digit', minute: '2-digit' };
+		}
+		
+
+		return (new Date(datetime)).toLocaleString("nb-NO", dateOptions);
 	}
 
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<title>Sushibar Ordre</title>
@@ -7,26 +8,31 @@
 	<link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.css">
 	<link rel="stylesheet" href="assets/css/style.css">
 </head>
+
 <body>
 
 	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
 		<div class="container-fluid">
 			<a class="navbar-brand" href="#">Sushibar Ordre</a>
-			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+				aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			</button>
 			<div class="collapse navbar-collapse" id="navbarCollapse">
 				<ul class="navbar-nav me-auto mb-2 mb-md-0">
 					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" id="dropdown03" data-bs-toggle="dropdown" aria-expanded="false">Rapporter</a>
+						<a class="nav-link dropdown-toggle" href="#" id="dropdown03" data-bs-toggle="dropdown"
+							aria-expanded="false">Rapporter</a>
 						<ul class="dropdown-menu dropdown-reports" aria-labelledby="dropdown03">
 						</ul>
 					</li>
 					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown"  href="#">Konfigurasjon</a>
+						<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Konfigurasjon</a>
 						<ul class="dropdown-menu" aria-labelledby="dropdown03">
-							<li><a data-bs-toggle="modal" data-bs-target="#restaurantSelectModal" class="dropdown-item">Velg restaurant</a></li>
-							<li><a data-bs-toggle="modal" data-bs-target="#printerSelectModal" class="dropdown-item">Velg printer</a></li>
+							<li><a data-bs-toggle="modal" data-bs-target="#restaurantSelectModal"
+									class="dropdown-item">Velg restaurant</a></li>
+							<li><a data-bs-toggle="modal" data-bs-target="#printerSelectModal"
+									class="dropdown-item">Velg printer</a></li>
 						</ul>
 					</li>
 
@@ -50,7 +56,8 @@
 			<div class="waiting-for-orders">
 				<h4>Venter på nye ordre</h4>
 				<div class="progress">
-					<div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+					<div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar"
+						aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
 				</div>
 			</div>
 
@@ -78,20 +85,23 @@
 
 		<footer>
 			<div class="statuses">
-				Restaurant: <span data-bs-toggle="modal" data-bs-target="#restaurantSelectModal" id="status-restaurant" class="badge rounded-pill status-pill bg-danger">Ikke koblet til</span>
-				Printer: <span data-bs-toggle="modal" data-bs-target="#printerSelectModal" id="status-printer" class="badge rounded-pill status-pill bg-success"></span>
+				Restaurant: <span data-bs-toggle="modal" data-bs-target="#restaurantSelectModal" id="status-restaurant"
+					class="badge rounded-pill status-pill bg-danger">Ikke koblet til</span>
+				Printer: <span data-bs-toggle="modal" data-bs-target="#printerSelectModal" id="status-printer"
+					class="badge rounded-pill status-pill bg-success"></span>
 				Server: <span id="status-server" class="badge rounded-pill status-pill bg-danger">Offline</span>
 			</div>
 		</footer>
 	</div>
 
 	<!-- New order alert Modal -->
-	<div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="printAlertModal" tabindex="-1" aria-labelledby="printAlertModalLabel" aria-hidden="true">
+	<div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="printAlertModal" tabindex="-1"
+		aria-labelledby="printAlertModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<form class="form" action="confirm_new_order">
 				<div class="modal-content new-order-alert">
 					<div class="modal-header">
-						<h5 class="modal-title" id="printAlertModalLabel">Ny ordre</h5>
+						<h5 class="modal-title" id="printAlertModalLabel">Ny ordre<span id="order-count"></span></h5>
 					</div>
 					<div class="modal-body">
 
@@ -106,7 +116,8 @@
 	</div>
 
 	<!-- Modal Select Printer -->
-	<div class="modal fade" id="printerSelectModal" tabindex="-1" aria-labelledby="printerSelectModalLabel" aria-hidden="true">
+	<div class="modal fade" id="printerSelectModal" tabindex="-1" aria-labelledby="printerSelectModalLabel"
+		aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<form class="form" action="choose_printer">
@@ -118,7 +129,7 @@
 						<div class="form-group">
 							<label for="exampleInputPassword1">Skriver</label>
 							<select id="printer" name="printer" class="form-control">
-								<option value="0">Velg</option>	
+								<option value="0">Velg</option>
 							</select>
 						</div>
 					</div>
@@ -132,7 +143,8 @@
 	</div>
 
 	<!-- Modal Select Restaurant -->
-	<div class="modal fade" id="restaurantSelectModal" tabindex="-1" aria-labelledby="restaurantSelectModalLabel" aria-hidden="true">
+	<div class="modal fade" id="restaurantSelectModal" tabindex="-1" aria-labelledby="restaurantSelectModalLabel"
+		aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<form class="form" action="choose_restaurant">
@@ -168,4 +180,5 @@
 	<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 	<script src="window.js"></script>
 </body>
+
 </html>

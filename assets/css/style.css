@@ -39,6 +39,10 @@ body {
 		top: 40%;
 	}
 
+.inner.cover {
+  padding-bottom: 50px;
+}
+
 .statuses {
   padding: 10px;
 }
