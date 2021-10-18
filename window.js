@@ -148,7 +148,7 @@ $(() => {
 
 
 		// open connection
-		connection = new WebSocket('ws://sushibar.no:1336');
+		connection = new WebSocket('ws://sushibar.no:1337');
 		connection.onopen = function () {
 
 			setServerOnline(true);
